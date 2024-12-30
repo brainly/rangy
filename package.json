@@ -20,7 +20,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/timdown/rangy.git"
+        "url": "https://github.com/brainly/rangy.git"
     },
     "main": "lib/rangy-core.js",
     "directories": {
