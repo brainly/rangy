@@ -1,5 +1,5 @@
 define(function (require) {
-    var rangy = require("rangy");
+    var rangy = require("@brainly/rangy");
     var stupidMagicAvoidance = require;
     rangy.init();
 

@@ -11,7 +11,7 @@ var FILE_ENCODING = "utf-8";
 var indentation = "    ";
 
 var buildSpec = {
-    gitUrl: "https://github.com/timdown/rangy.git",
+    gitUrl: "https://github.com/brainly/rangy.git",
     gitBranch: "master"
 };
 
@@ -169,7 +169,7 @@ function copyModuleScripts() {
                 '        define(["./rangy-core"], factory);',
                 '    } else if (typeof module != "undefined" && typeof exports == "object") {',
                 '        // Node/CommonJS style',
-                '        module.exports = factory( require("rangy") );',
+                '        module.exports = factory( require("@brainly/rangy") );',
                 '    } else {',
                 '        // No AMD or CommonJS support so we use the rangy property of root (probably the global variable)',
                 '        factory(root.rangy);',
