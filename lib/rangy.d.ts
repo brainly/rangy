@@ -72,6 +72,7 @@ declare module '@brainly/rangy' {
         removeAllHighlights(): void;
         deserialize(serializedHighlights: string): Highlight[];
         serialize(): string;
+        getHighlightForElement(element: GlobalEventHandlers): Highlight | null;
     }
 
     export interface RangyClassApplier {
@@ -88,7 +89,9 @@ declare module '@brainly/rangy' {
 
     export interface ClassApplierOptions {
         elementTagName?: string; // Default: "span"
-        elementProperties?: Record<string, any>;
+        elementProperties?: Partial<Omit<HTMLElement, 'style'>> & {
+            style?: Partial<CSSStyleDeclaration>;
+        }; // Default: {}
         elementAttributes?: Record<string, string>;
         useExistingElements?: boolean; // Default: false
         ignoreWhiteSpace?: boolean; // Default: true
@@ -97,11 +100,18 @@ declare module '@brainly/rangy' {
         onElementCreate?: (element: HTMLElement, className: string, range: RangyRange) => void;
     }
 
+    export interface CharacterRange {
+        start: number;
+        end: number;
+    }
+
     export interface Highlight {
         id: string;
         className: string;
         containerElementId: string;
         range: RangyRange;
+        characterRange: CharacterRange;
+        getText: () => string;  
         toString(): string;
     }
 
