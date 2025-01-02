@@ -17,6 +17,11 @@ jobs:
       - name: Checkout Fork
         uses: actions/checkout@v3
 
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       # Step 2: Fetch updates from the upstream repository
       - name: Fetch Upstream
         run: |
