@@ -1,0 +1,53 @@
+name: Sync Fork with Upstream and Request Review
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Runs daily at 2:00 AM UTC
+  workflow_dispatch: # Allows manual trigger
+
+permissions:
+  contents: write # Required to push changes and create pull requests
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the forked repository
+      - name: Checkout Fork
+        uses: actions/checkout@v3
+
+      # Step 2: Fetch updates from the upstream repository
+      - name: Fetch Upstream
+        run: |
+          git remote add upstream https://github.com/timdown/rangy.git
+          git fetch upstream
+          git checkout main
+          git merge upstream/main --no-commit --no-ff
+
+      # Step 3: Create a new branch with the updates
+      - name: Create Sync Branch
+        run: |
+          git checkout -b sync-upstream-$(date +%Y%m%d%H%M%S)
+          git add .
+          git commit -m "Sync with upstream changes"
+
+      # Step 4: Push the new branch to your fork
+      - name: Push Changes to New Branch
+        run: |
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD
+
+      # Step 5: Create a pull request and request a review
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Sync with upstream"
+          branch: sync-upstream-$(date +%Y%m%d%H%M%S)
+          base: main
+          title: "Sync with upstream changes"
+          body: |
+            This PR syncs the forked repository with the latest changes from the upstream repository (timdown/rangy).
+            
+            Please review and merge if everything looks good.
+          reviewers: brainly/frontend-infra
