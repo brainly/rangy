@@ -17,33 +17,52 @@ jobs:
       - name: Checkout Fork
         uses: actions/checkout@v3
 
+      # Step 2: Set Git User Identity
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      # Step 2: Fetch updates from the upstream repository
+      # Step 3: Fetch updates from the upstream repository
       - name: Fetch Upstream
         run: |
           git remote add upstream https://github.com/timdown/rangy.git
           git fetch upstream
           git checkout master
-          git merge upstream/master --no-commit --no-ff
+          git merge upstream/master --no-commit --no-ff || true
 
-      # Step 3: Create a new branch with the updates
+      # Step 4: Check if there are changes
+      - name: Check for Changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "no_changes=true" >> $GITHUB_ENV
+          else
+            echo "no_changes=false" >> $GITHUB_ENV
+          fi
+
+      # Step 5: Exit if no changes
+      - name: Exit if No Changes
+        if: env.no_changes == 'true'
+        run: echo "No changes to sync. Exiting."
+
+      # Step 6: Create a new branch with the updates
       - name: Create Sync Branch
+        if: env.no_changes == 'false'
         run: |
           git checkout -b sync-upstream-$(date +%Y%m%d%H%M%S)
           git add .
           git commit -m "Sync with upstream changes"
 
-      # Step 4: Push the new branch to your fork
+      # Step 7: Push the new branch to your fork
       - name: Push Changes to New Branch
+        if: env.no_changes == 'false'
         run: |
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD
 
-      # Step 5: Create a pull request and request a review
+      # Step 8: Create a pull request and request a review
       - name: Create Pull Request
+        if: env.no_changes == 'false'
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
